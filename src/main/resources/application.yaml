@@ -1,0 +1,43 @@
+api:
+  prefix: "api"
+  currentVersion: "v1"
+
+server:
+  port: 8082
+  error:
+    include-message: always
+    include-exception: true
+
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/MIoCS?createDatabaseIfNotExist=true
+    username: postgres
+    password: SuperUserHere
+  jpa:
+    defer-datasource-initialization: true
+    generate-ddl: true
+
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+        generate_statistics: true
+        # current_session_context_class: org.hibernate.context.internal.ThreadLocalSessionContext
+        ddl-auto: create-drop
+
+  sql:
+    init:
+      platform: postgres
+      mode: always
+
+# Logging configuration
+logging:
+  level:
+    org:
+      hibernate:
+        sql: info
+
