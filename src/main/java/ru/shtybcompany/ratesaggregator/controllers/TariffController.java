@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.shtybcompany.ratesaggregator.enities.TariffEntity;
-import ru.shtybcompany.ratesaggregator.services.converters.MegafonTariffConverter;
+import ru.shtybcompany.ratesaggregator.services.MainService;
 
 import java.io.IOException;
 
@@ -17,18 +17,18 @@ import java.io.IOException;
                 "/")
 public class TariffController {
 
-    private final MegafonTariffConverter megafonTariffConverter;
+    private final MainService mainService;
 
     @Autowired
     public TariffController(
-            MegafonTariffConverter megafonTariffConverter
+            MainService mainService
     ) {
-        this.megafonTariffConverter = megafonTariffConverter;
+        this.mainService = mainService;
     }
 
     @GetMapping("/")
-    public ResponseEntity<Iterable<TariffEntity>> getById() throws IOException {
-        Iterable<TariffEntity> tariffs = this.megafonTariffConverter.parseHtmlToTariffs();
+    public ResponseEntity<Iterable<TariffEntity>> getAll() throws IOException {
+        Iterable<TariffEntity> tariffs = this.mainService.getAndConvertTariffs();
         return ResponseEntity.ok(tariffs);
     }
 }

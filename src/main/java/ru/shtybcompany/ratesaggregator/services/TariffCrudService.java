@@ -2,7 +2,6 @@ package ru.shtybcompany.ratesaggregator.services;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +13,14 @@ import ru.shtybcompany.ratesaggregator.mappers.read.max.AbstractTariffEntityToMa
 import ru.shtybcompany.ratesaggregator.mappers.write.AbstractTariffDtoToEntityMapper;
 import ru.shtybcompany.ratesaggregator.repositories.TariffRepository;
 
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@Transactional
+//@Transactional
 public class TariffCrudService implements CrudService<TariffEntity, TariffCreationDto, TariffMaxInfoDto, UUID> {
 
     private final Logger logger = LoggerFactory.getLogger(TariffCrudService.class);
@@ -29,12 +29,13 @@ public class TariffCrudService implements CrudService<TariffEntity, TariffCreati
     private final AbstractTariffDtoToEntityMapper tariffDtoToEntityMapper;
     private final AbstractTariffEntityToMaxInfoDtoMapper tariffEntityToMaxInfoDtoMapper;
 
+
     @Autowired
     public TariffCrudService(
             TariffRepository tariffRepository,
             AbstractTariffDtoToEntityMapper tariffDtoToEntityMapper,
             AbstractTariffEntityToMaxInfoDtoMapper tariffEntityToMaxInfoDtoMapper
-    ) {
+) {
         this.tariffRepository = tariffRepository;
         this.tariffDtoToEntityMapper = tariffDtoToEntityMapper;
         this.tariffEntityToMaxInfoDtoMapper = tariffEntityToMaxInfoDtoMapper;
@@ -52,6 +53,10 @@ public class TariffCrudService implements CrudService<TariffEntity, TariffCreati
             throw exception;
         }
 
+        tariff = tariff.toBuilder()
+                .withCreatedAt(LocalDateTime.now())
+                .withUpdatedAt(LocalDateTime.now())
+                .build();
         tariff = this.tariffRepository.save(tariff);
         return tariff;
     }
