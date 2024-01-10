@@ -6,26 +6,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.shtybcompany.ratesaggregator.dto.creation.TariffCreationDto;
 import ru.shtybcompany.ratesaggregator.enities.TariffEntity;
-import ru.shtybcompany.ratesaggregator.services.converters.MegafonTariffConverter;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 @Service
 public class MainService {
 
     private final Logger logger = LoggerFactory.getLogger(MainService.class);
-    private final MegafonTariffConverter megafonTariffConverter;
+    private final TariffConvertionService tariffConvertionService;
     private final TariffCrudService tariffCrudService;
 
     @Autowired
-    public MainService(MegafonTariffConverter megafonTariffConverter, TariffCrudService tariffCrudService) {
-        this.megafonTariffConverter = megafonTariffConverter;
+    public MainService(
+            TariffConvertionService tariffConvertionService,
+            TariffCrudService tariffCrudService
+    ) {
+        this.tariffConvertionService = tariffConvertionService;
         this.tariffCrudService = tariffCrudService;
     }
 
     public Iterable<TariffEntity> getAndConvertTariffs() throws IOException {
-        Iterable<TariffCreationDto> tariffDtos = this.megafonTariffConverter.parseHtmlToTariffs();
-        Iterable<TariffEntity> entities = this.tariffCrudService.create(tariffDtos);
-        return entities;
+        ArrayList<TariffCreationDto> tariffs = this.tariffConvertionService.getConvertedTariffs();
+        Iterable<TariffEntity> savedEntities = this.tariffCrudService.create(tariffs);
+        return savedEntities;
     }
 }

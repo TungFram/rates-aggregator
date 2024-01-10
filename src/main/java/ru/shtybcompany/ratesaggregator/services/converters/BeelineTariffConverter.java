@@ -13,63 +13,56 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-
 @Service
-public class MegafonTariffConverter implements TariffConverter{
+public class BeelineTariffConverter implements TariffConverter {
 
     private final Logger logger = LoggerFactory.getLogger(MegafonTariffConverter.class);
 
-    private final String SOURCE_LINK = "https://spb.megafon.ru/tariffs/all/";
+    private final String SOURCE_LINK = "https://spb.beeline.ru/customers/products/mobile/tariffs/";
 
     public List<TariffCreationDto> convert2TariffDtos() throws IOException {
         var result = new LinkedList<TariffCreationDto>();
 
         Document doc = Jsoup.connect(SOURCE_LINK).get();
 
-        Elements tariffWrappers = doc.select(".tariffs-carousel-v3__card-wrapper");
+        Elements tariffWrappers = doc.select(".E9tSER");
         for (Element tariffWrapper : tariffWrappers) {
             var tariffCreationDto = new TariffCreationDto();
 
-            Element titleRefEl = tariffWrapper.selectFirst(".tariffs-card-header-v3__title-link");
-            String reference = titleRefEl.attr("abs:href");
-
-            Document tariffInfo;
-            try {
-                tariffInfo = Jsoup.connect(reference).get();
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            Element refEl = tariffWrapper.selectFirst(".d0ZXHD");
+            String reference = refEl.attr("abs:href");
 
 
-            Element tariffBanner = tariffInfo.selectFirst(".tariffs-detail-banner__banner");
-            String tariffTitle = tariffBanner.child(0).text();
-            String tariffDesc = tariffBanner.child(1).text();
+            String tariffTitle = tariffWrapper.selectFirst(".QpPCUG").ownText();
+            String tariffDesc = doc.selectFirst(".xlJ9gj").ownText();
 
             tariffCreationDto.setTitle(tariffTitle);
             tariffCreationDto.setDescription(tariffDesc);
             tariffCreationDto.setUrl(reference);
             tariffCreationDto.setArchived(false);
 
-            Elements detailItems = tariffInfo.select(".tariffs-detail-short-base-item");
+            Elements detailItems = tariffWrapper.select(".value--default");
             for (Element detailItem : detailItems) {
-                Elements itemValueEl = detailItem.select(".tariffs-detail-short-base-item__value");
-                String itemValue = itemValueEl.text();
-                int value = Integer.parseInt(itemValue.split(" ")[0]);
-                String type = itemValue.split(" ")[1];
+                Element element = detailItem.selectFirst(".JcQa1x");
+                if (element == null) {
+                    continue;
+                }
+
+                String itemValue = element.ownText();
+                int value = Integer.parseInt(itemValue);
+                String type = detailItem.selectFirst(".xQvJV2").ownText();
 
                 switch (type) {
                     case "ГБ":
                         tariffCreationDto.setGbs(value);
                         break;
-                    case "минут":
+                    case "мин":
                         tariffCreationDto.setMinutes(value);
-                        break;
-                    case "SMS":
-                        tariffCreationDto.setSms(value);
                         break;
                 }
             }
+
+            tariffCreationDto.setSms(0);
 
 //            String priceStr = tariffInfo.selectFirst(".tariffs-price__price_current").text();
 //            int price = Integer.parseInt(priceStr.split(" ")[0]);
