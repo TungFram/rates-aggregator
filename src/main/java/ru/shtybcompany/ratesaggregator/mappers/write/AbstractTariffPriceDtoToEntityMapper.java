@@ -12,6 +12,7 @@ import ru.shtybcompany.ratesaggregator.mappers.read.min.AbstractTariffPriceEntit
 
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
+import java.util.Collection;
 
 @Component
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
@@ -40,6 +41,6 @@ public abstract class AbstractTariffPriceDtoToEntityMapper
     }
 
     @Override
-    public abstract Iterable<TariffPriceEntity> dtoToEntity(Iterable<TariffPriceCreateDto> tariffPriceCreateDtos) throws IllegalArgumentException;
+    public abstract Collection<TariffPriceEntity> dtoToEntity(Iterable<TariffPriceCreateDto> tariffPriceCreateDtos) throws IllegalArgumentException;
 
 }

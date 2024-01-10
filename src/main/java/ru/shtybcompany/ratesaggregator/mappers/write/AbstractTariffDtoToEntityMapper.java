@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import ru.shtybcompany.ratesaggregator.dto.creation.TariffCreationDto;
 import ru.shtybcompany.ratesaggregator.enities.TariffEntity;
 
+import java.util.Collection;
+
 
 @Component
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
@@ -33,6 +35,6 @@ public abstract class AbstractTariffDtoToEntityMapper
     }
 
     @Override
-    public abstract Iterable<TariffEntity> dtoToEntity(Iterable<TariffCreationDto> tariffCreationDtos) throws IllegalArgumentException;
+    public abstract Collection<TariffEntity> dtoToEntity(Iterable<TariffCreationDto> tariffCreationDtos) throws IllegalArgumentException;
 
 }

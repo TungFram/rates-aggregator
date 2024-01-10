@@ -2,43 +2,37 @@ package ru.shtybcompany.ratesaggregator.services;
 
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.shtybcompany.ratesaggregator.dto.creation.TariffCreationDto;
-import ru.shtybcompany.ratesaggregator.dto.info.max.TariffMaxInfoDto;
 import ru.shtybcompany.ratesaggregator.enities.TariffEntity;
-import ru.shtybcompany.ratesaggregator.mappers.read.max.AbstractTariffEntityToMaxInfoDtoMapper;
 import ru.shtybcompany.ratesaggregator.mappers.write.AbstractTariffDtoToEntityMapper;
+import ru.shtybcompany.ratesaggregator.mappers.write.AbstractTariffDtoToEntityMapperImpl;
 import ru.shtybcompany.ratesaggregator.repositories.TariffRepository;
 
 import java.time.LocalDateTime;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
-//@Transactional
-public class TariffCrudService implements CrudService<TariffEntity, TariffCreationDto, TariffMaxInfoDto, UUID> {
+@Transactional
+public class TariffCrudService implements CrudService<TariffEntity, TariffCreationDto, UUID> {
 
     private final Logger logger = LoggerFactory.getLogger(TariffCrudService.class);
 
     private final TariffRepository tariffRepository;
     private final AbstractTariffDtoToEntityMapper tariffDtoToEntityMapper;
-    private final AbstractTariffEntityToMaxInfoDtoMapper tariffEntityToMaxInfoDtoMapper;
 
 
     @Autowired
     public TariffCrudService(
             TariffRepository tariffRepository,
-            AbstractTariffDtoToEntityMapper tariffDtoToEntityMapper,
-            AbstractTariffEntityToMaxInfoDtoMapper tariffEntityToMaxInfoDtoMapper
+            AbstractTariffDtoToEntityMapperImpl tariffDtoToEntityMapper
 ) {
         this.tariffRepository = tariffRepository;
         this.tariffDtoToEntityMapper = tariffDtoToEntityMapper;
-        this.tariffEntityToMaxInfoDtoMapper = tariffEntityToMaxInfoDtoMapper;
     }
 
 
@@ -53,9 +47,19 @@ public class TariffCrudService implements CrudService<TariffEntity, TariffCreati
             throw exception;
         }
 
+//        int price = 0;
+//        CurrencyUnit rubCurrency = Monetary.getCurrency("RUB");
+//        var money = Money.of(price, rubCurrency);
+//        var priceEntity = TariffPriceEntity.createBuilder()
+//                .withTariff(tariff)
+//                .withMoney(money)
+//                .withPreviousPrice(null)
+//                .build();
+
         tariff = tariff.toBuilder()
                 .withCreatedAt(LocalDateTime.now())
                 .withUpdatedAt(LocalDateTime.now())
+//                .withPrice(priceEntity)
                 .build();
         tariff = this.tariffRepository.save(tariff);
         return tariff;
@@ -81,14 +85,13 @@ public class TariffCrudService implements CrudService<TariffEntity, TariffCreati
     }
 
     @Override
-    public Iterable<TariffEntity> getById(Iterable<UUID> uuids) throws EntityNotFoundException {
-        var result = new LinkedList<TariffEntity>();
-        for (UUID uuid : uuids) {
-            TariffEntity tariff = this.getById(uuid);
-            result.add(tariff);
+    public Collection<TariffEntity> getById(Collection<UUID> uuids) throws EntityNotFoundException {
+        List<TariffEntity> tariffEntities = this.tariffRepository.findAllById(uuids);
+        if (uuids.size() != tariffEntities.size()) {
+            throw new EntityNotFoundException("Some of tariffs does not exist!");
         }
 
-        return result;
+        return tariffEntities;
     }
 
     @Override
@@ -104,31 +107,9 @@ public class TariffCrudService implements CrudService<TariffEntity, TariffCreati
     }
 
     @Override
-    public Iterable<Optional<TariffEntity>> findById(Iterable<UUID> uuids) {
-        var result = new LinkedList<Optional<TariffEntity>>();
-        for (UUID uuid : uuids) {
-            Optional<TariffEntity> optionalTariff = this.findById(uuid);
-            result.add(optionalTariff);
-        }
-
-        return result;
-    }
-
-    @Override
     public Boolean existsById(UUID uuid) {
         Boolean exists = this.tariffRepository.existsById(uuid);
         return exists;
-    }
-
-    @Override
-    public Iterable<Boolean> existsById(Iterable<UUID> uuids) {
-        var result = new LinkedList<Boolean>();
-        for (UUID uuid : uuids) {
-            Boolean exists = this.existsById(uuid);
-            result.add(exists);
-        }
-
-        return result;
     }
 
     @Override

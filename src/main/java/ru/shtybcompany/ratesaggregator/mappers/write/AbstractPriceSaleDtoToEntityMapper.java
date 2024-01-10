@@ -5,6 +5,8 @@ import org.springframework.stereotype.Component;
 import ru.shtybcompany.ratesaggregator.dto.creation.PriceSaleCreationDto;
 import ru.shtybcompany.ratesaggregator.enities.PriceSaleEntity;
 
+import java.util.Collection;
+
 @Component
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         injectionStrategy = InjectionStrategy.CONSTRUCTOR,
@@ -31,7 +33,7 @@ public abstract class AbstractPriceSaleDtoToEntityMapper
     }
 
     @Override
-    public abstract Iterable<PriceSaleEntity> dtoToEntity(Iterable<PriceSaleCreationDto> priceSaleCreationDtos) throws IllegalArgumentException;
+    public abstract Collection<PriceSaleEntity> dtoToEntity(Iterable<PriceSaleCreationDto> priceSaleCreationDtos) throws IllegalArgumentException;
 
 
 

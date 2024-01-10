@@ -11,7 +11,7 @@ import ru.shtybcompany.ratesaggregator.mappers.read.EntityToInfoDtoMapper;
         injectionStrategy = InjectionStrategy.CONSTRUCTOR,
         collectionMappingStrategy = CollectionMappingStrategy.TARGET_IMMUTABLE,
         uses = {
-            AbstractTariffPriceEntityToMaxInfoDtoMapper.class,
+//            AbstractTariffPriceEntityToMaxInfoDtoMapper.class,
         })
 public abstract class AbstractTariffEntityToMaxInfoDtoMapper implements EntityToInfoDtoMapper<TariffEntity, TariffMaxInfoDto> {
 
@@ -28,8 +28,8 @@ public abstract class AbstractTariffEntityToMaxInfoDtoMapper implements EntityTo
     @Mapping(target = "gbs",            source = "entity.gbs")
     @Mapping(target = "minutes",        source = "entity.minutes")
     @Mapping(target = "isArchived",     source = "entity.isArchived")
-    @Mapping(target = "actualPrice",    source = "entity.prices",
-            qualifiedByName = { "TariffPriceToMaxInfoDtoMapper", "PricesToCurrentPrice" })
+//    @Mapping(target = "actualPrice",    source = "entity.prices",
+//            qualifiedByName = { "TariffPriceToMaxInfoDtoMapper", "PricesToCurrentPrice" })
     public abstract TariffMaxInfoDto entityToDto(TariffEntity entity);
 
     @Override

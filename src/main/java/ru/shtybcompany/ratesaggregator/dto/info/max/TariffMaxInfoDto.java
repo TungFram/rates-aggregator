@@ -19,6 +19,6 @@ public class TariffMaxInfoDto implements InfoDto {
 
     Boolean isArchived;
 
-    TariffPriceMaxInfoDto actualPrice;
+//    TariffPriceMaxInfoDto actualPrice;
 
 }
